@@ -1,3 +1,0 @@
-#!/bin/env perl
-
-print (join("",(1..9)).(join("",(0..9))x5));
