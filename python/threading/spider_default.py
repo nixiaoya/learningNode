@@ -8,52 +8,13 @@
 '''
 
 import re
-import threading
-import Queue
 import time
 import urllib2
 import socket
+import threading
 
 def MyException(Exception):
     pass
-
-class Consumer(threading.Thread):
-    def __init__(self, queue):
-       threading.Thread.__init__(self)
-       self._queue = queue
-
-    def run(self):
-        while True:
-            content = self._queue.get()
-            if isinstance(content, str) and content == 'quit':
-                break
-            getDiseaseLink(content)
-            #response = urllib2.urlopen(content)
-            print self.getName(),content
-            
-def Poll(queue, size):
-    workers = []
-    for _ in range(size):
-        worker = Consumer(queue)
-        worker.start()
-        workers.append(worker)
-    return workers
-
-def Producer(urls, threads=4):
-    queue = Queue.Queue()
-    worker_threads = Poll(queue, threads)
-    start_time = time.time()
-
-    for url in urls:
-        queue.put(url)
-
-    for worker in worker_threads:
-        queue.put('quit')
-
-    for worker in worker_threads:
-        worker.join()
-
-    print 'Done! Time taken: {}'.format(time.time() - start_time)
    
 def getContent(req_url, req_data={}):
     '''
@@ -95,36 +56,35 @@ def getCategory(req_url):
     content = getContent(req_url)
     return getMatchItems(re1, content)
 
-def getDiseaseLink(catgory):
+def getDiseaseLink(category_list, host):
     '''
     根据类型列表，获取各类型的疾病列表
     '''
-    global disease_list
-    global host
-    global linkLock
+    disease_list = []
     
     re1 = re.compile(r'\d+')
     re2 = re.compile(r'.*(/dkd/disease/.*/)".*') 
     
-    page = 1
-    while True:
-        replace_url = host +re1.sub(str(page), catgory)
-        try:
-            content = getContent(replace_url)
-        except Exception as e:
-            break 
-        else:
-            links = getMatchItems(re2, content)
-            
-            if links:
-                if linkLock.acquire():
+    
+    for cat in category_list:
+        print threading.currentThread().getName(),cat
+        page = 1
+        while True:
+            replace_url = host +re1.sub(str(page), cat)
+            try:
+                content = getContent(replace_url)
+            except Exception as e:
+                break 
+            else:
+                links = getMatchItems(re2, content)
+                
+                if links:
                     page += 1
                     for link in links:
                         if link not in disease_list:
                             disease_list.append(link)
-                    linkLock.release()
-            else:
-                break
+                else:
+                    break
                     
     return disease_list
                 
@@ -146,18 +106,16 @@ def getDisease(disease_dic, host):
                 print introduction 
 
 def __main__():
-    global host
-    global disease_list
+    host = 'http://172.16.36.14'
     home = '/dkd/'
-   
+    
+    start_time = time.time()
     category_list = getCategory(host + home)
-    Producer(category_list)
+    disease_list = getDiseaseLink(category_list, host)
+    print 'Done! Time taken: {}'.format(time.time() - start_time)
     print len(disease_list)
     #disease_list = getDiseaseLink(category_list, host)
     #getDisease(disease_dic, host)
     
 if __name__ == "__main__":
-    host = 'http://172.16.36.14'
-    disease_list = []
-    linkLock = threading.Lock()
     __main__()
