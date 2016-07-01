@@ -1,0 +1,92 @@
+<html><head><title>Web Socket Client</title></head> 
+ 
+<body> 
+
+<script type="text/javascript"> 
+ 
+var socket; 
+ 
+if (!window.WebSocket) { 
+ 
+    window.WebSocket = window.MozWebSocket; 
+ 
+} 
+ 
+// Javascript Websocket Client 
+ 
+if (window.WebSocket) { 
+ 
+    socket = new WebSocket("ws://172.16.36.39:8080/websocket"); 
+ 
+    socket.onmessage = function(event) { 
+ 
+        var ta = document.getElementById('responseText');
+		var msgcount = document.getElementById('msgcount');
+		var usercount = document.getElementById('user');
+		var info = JSON.parse(event.data)
+ 
+        ta.value = ta.value + '\n' + info.msg; 
+		msgcount.value = info.c1;
+		usercount.value = info.c2;
+ 
+    }; 
+ 
+    socket.onopen = function(event) { 
+ 
+        var ta = document.getElementById('responseText'); 
+ 
+        ta.value = "Web Socket opened!"; 
+ 
+    }; 
+ 
+    socket.onclose = function(event) { 
+ 
+        var ta = document.getElementById('responseText'); 
+ 
+        ta.value = ta.value + "Web Socket closed"; 
+ 
+    }; 
+ 
+} else { 
+ 
+    alert("Your browser does not support Web Socket."); 
+ 
+} 
+ 
+// Send Websocket data 
+ 
+function send(message) { 
+ 
+    if (!window.WebSocket) { return; } 
+ 
+    if (socket.readyState == WebSocket.OPEN) { 
+ 
+        socket.send(message); 
+ 
+    } else { 
+ 
+        alert("The socket is not open."); 
+ 
+    } 
+ 
+} 
+ 
+</script> 
+ 
+<h3>Send :</h3> 
+ 
+<form onsubmit="return false;"> 
+ 
+<input type="text" name="message" value="Hello World!"/><input type="button" value="Send Web Socket Data" onclick="send(this.form.message.value)" /> 
+ 
+<h3>Receive :</h3> 
+<label>Messages</label><input id="msgcount"></input>
+<label>Users</label><input id="user"></input>
+ 
+<textarea id="responseText" style="width:500px;height:300px;"></textarea> 
+ 
+</form> 
+ 
+</body> 
+ 
+</html>
