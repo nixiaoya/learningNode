@@ -6,17 +6,14 @@ import csv
 import time
 
 def multiLoader(user_list, r):
-    pipe = r.pipeline()
-
     for email, user in user_list:
-        pipe.set(email, user)
-    pipe.execute()
+        r.set(email, user)
 
-nodes = [
+startup_nodes = [
         {"host":"127.0.0.1", "port":"6379"},
-        {"host":"127.0.0.1", "port":"6381"}
+        {"host":"127.0.0.1", "port":"6380"}
     ]
-rc = StrictRedisCluster(startup_nodes=nodes, decode_response=True)
+rc = StrictRedisCluster(startup_nodes=startup_nodes)
 set_count = 0
 start_time = int(time.time())
 
