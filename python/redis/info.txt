@@ -1,0 +1,7 @@
+未使用事务（管道）
+chapt2.1.py
+767556 items in #333 seconds
+
+使用事务 
+chapt2.py
+767556 items in #27 seconds
