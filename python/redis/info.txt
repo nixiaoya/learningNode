@@ -5,3 +5,6 @@ chapt2.1.py
 使用事务 
 chapt2.py
 767556 items in #27 seconds
+
+使用集群
+767556 items in #349 seconds

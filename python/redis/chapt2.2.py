@@ -11,7 +11,8 @@ def multiLoader(user_list, r):
 
 startup_nodes = [
         {"host":"127.0.0.1", "port":"6379"},
-        {"host":"127.0.0.1", "port":"6380"}
+        {"host":"127.0.0.1", "port":"6380"},
+        {"host":"127.0.0.1", "port":"6381"}
     ]
 rc = StrictRedisCluster(startup_nodes=startup_nodes)
 set_count = 0
